@@ -28,11 +28,11 @@ button:focus-visible{outline:3px solid #5d9dd9;outline-offset:2px}
 .awning{position:absolute;left:0;right:0;top:0;height:43px;background:repeating-linear-gradient(90deg,#f29aad 0 48px,#fff1e7 48px 96px);border-bottom:3px solid #a87662}
 .sign{position:absolute;left:50%;top:42px;transform:translateX(-50%);background:#fff7e8;border:3px solid #8f5f4e;border-radius:10px;padding:5px 15px;font-weight:1000;letter-spacing:.5px;box-shadow:0 3px 0 rgba(80,50,40,.12);white-space:nowrap}
 .order-area{padding:10px 12px 12px;background:#fff5e6}
-.customer{display:flex;gap:10px;align-items:flex-start}
+.customer{display:flex;gap:10px;align-items:flex-start;min-width:0}
 .avatar{width:58px;height:58px;border-radius:50%;border:4px solid #e7839a;background:#ffe0dc;display:grid;place-items:center;font-size:29px;flex:0 0 auto}
-.speech{position:relative;flex:1;background:#fff;border:2px solid #caa891;border-radius:15px;padding:9px 11px;box-shadow:0 2px 0 rgba(90,55,40,.08)}
+.speech{position:relative;flex:1;min-width:0;background:#fff;border:2px solid #caa891;border-radius:15px;padding:9px 11px;box-shadow:0 2px 0 rgba(90,55,40,.08)}
 .speech:before{content:"";position:absolute;left:-9px;top:16px;border-width:7px 9px 7px 0;border-style:solid;border-color:transparent #caa891 transparent transparent}
-.order-title{font-weight:900;font-size:14px}.order-detail{font-size:13px;margin-top:3px;line-height:1.35}
+.order-title{font-weight:900;font-size:14px;white-space:normal;overflow-wrap:anywhere}.order-detail{font-size:13px;margin-top:3px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;word-break:normal}
 .patience{height:11px;border:2px solid #78aa80;border-radius:99px;background:#dff1df;overflow:hidden;margin-top:7px}
 .patience i{display:block;height:100%;background:#72bd82;width:100%;transition:width .2s}
 .section{padding:9px 12px;border-top:2px solid #d1b194}
@@ -92,7 +92,7 @@ input[type=range]{width:100%;accent-color:#b86f53}
 .inv{padding:9px;background:#fff;border:2px solid #c7a58d;border-radius:10px;display:flex;justify-content:space-between;font-size:12px}.inv b{font-size:14px}
 .upgrades{display:grid;gap:8px}.upgrade{background:#fff;border:2px solid #c7a58d;border-radius:11px;padding:10px;display:flex;justify-content:space-between;gap:8px;align-items:center}.upgrade button{border:0;background:#d98e68;color:#fff;border-radius:8px;padding:8px 10px;font-weight:900;cursor:pointer}.upgrade button:disabled{opacity:.4}
 .modal{position:fixed;inset:0;background:rgba(59,37,28,.52);display:grid;place-items:center;padding:18px;z-index:50}.modal-card{width:min(440px,100%);background:#fff7e8;border:3px solid #9f725c;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}.modal-card h2{margin:0 0 7px}.modal-card p{font-size:13px;line-height:1.5}.modal-actions{display:grid;gap:8px;margin-top:12px}.modal-actions button{padding:11px;border:2px solid #b98e76;border-radius:10px;background:#fff;cursor:pointer;font-weight:900}.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#51362b;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;font-weight:900;z-index:60;box-shadow:0 5px 18px rgba(0,0,0,.2);pointer-events:none}
-@media(max-width:430px){.base-grid{grid-template-columns:repeat(3,1fr)}.grid{gap:5px}.topping{min-height:68px}.money{font-size:14px;padding:6px 8px}.section{padding-left:9px;padding-right:9px}}
+@media(max-width:430px){.base-grid{grid-template-columns:repeat(3,1fr)}.grid{gap:5px}.topping{min-height:68px}.money{font-size:14px;padding:6px 8px}.section{padding-left:9px;padding-right:9px}.order-area{padding-left:9px;padding-right:9px}.customer{gap:8px}.avatar{width:54px;height:54px;font-size:27px}.speech{padding:8px 10px}.order-detail{font-size:12.5px;line-height:1.4}}
 
 /* =========================================================
    MOBILE GAMEPLAY — iPHONE 13 / 390×844
