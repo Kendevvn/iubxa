@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Tiệm Trà Sữa — Mobile Gameplay</title>
+<style>
+:root{
+  --ink:#4b3329;--muted:#8b6f61;--paper:#fff8e9;--cream:#f7ecd8;
+  --pink:#ef9cae;--pink2:#ffd9df;--green:#8fc39c;--green2:#dff1df;
+  --orange:#efaa5c;--yellow:#f5d47b;--brown:#6d4537;--line:#b98e76;
+  --shadow:0 4px 0 rgba(93,57,42,.16),0 10px 24px rgba(93,57,42,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#ead9c3;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:3px solid #5d9dd9;outline-offset:2px}
+#game{max-width:760px;margin:0 auto;background:var(--cream);min-height:100vh;overflow:hidden}
+.topbar{padding:12px 14px 8px;background:#fff7e8;border-bottom:3px solid #d3ae91;position:sticky;top:0;z-index:10}
+.toprow{display:flex;align-items:center;gap:10px}
+.pause{width:44px;height:44px;border-radius:50%;border:3px solid #d78b9b;background:#ffe6ea;font-size:20px;font-weight:900}
+.daybox{flex:1}.day{font-size:18px;font-weight:900}.clock{font-size:12px;color:var(--muted);margin-top:2px}
+.money{font-weight:900;font-size:17px;background:#fff;border:2px solid #d5b397;border-radius:12px;padding:7px 10px}
+.stats{display:flex;gap:7px;margin-top:8px;overflow:auto;padding-bottom:2px}
+.stat{background:#fff;border:2px solid #dfc2a8;border-radius:999px;padding:5px 9px;font-size:12px;white-space:nowrap}
+.stat b{font-size:13px}
+.shopfront{height:95px;background:linear-gradient(#ffe9d8,#f8c6b9);border-bottom:3px solid #a87662;position:relative;overflow:hidden}
+.awning{position:absolute;left:0;right:0;top:0;height:43px;background:repeating-linear-gradient(90deg,#f29aad 0 48px,#fff1e7 48px 96px);border-bottom:3px solid #a87662}
+.sign{position:absolute;left:50%;top:42px;transform:translateX(-50%);background:#fff7e8;border:3px solid #8f5f4e;border-radius:10px;padding:5px 15px;font-weight:1000;letter-spacing:.5px;box-shadow:0 3px 0 rgba(80,50,40,.12);white-space:nowrap}
+.order-area{padding:10px 12px 12px;background:#fff5e6}
+.customer{display:flex;gap:10px;align-items:flex-start}
+.avatar{width:58px;height:58px;border-radius:50%;border:4px solid #e7839a;background:#ffe0dc;display:grid;place-items:center;font-size:29px;flex:0 0 auto}
+.speech{position:relative;flex:1;background:#fff;border:2px solid #caa891;border-radius:15px;padding:9px 11px;box-shadow:0 2px 0 rgba(90,55,40,.08)}
+.speech:before{content:"";position:absolute;left:-9px;top:16px;border-width:7px 9px 7px 0;border-style:solid;border-color:transparent #caa891 transparent transparent}
+.order-title{font-weight:900;font-size:14px}.order-detail{font-size:13px;margin-top:3px;line-height:1.35}
+.patience{height:11px;border:2px solid #78aa80;border-radius:99px;background:#dff1df;overflow:hidden;margin-top:7px}
+.patience i{display:block;height:100%;background:#72bd82;width:100%;transition:width .2s}
+.section{padding:9px 12px;border-top:2px solid #d1b194}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.section-title{font-weight:1000;font-size:15px;background:#ffe6cf;border:2px solid #b8876d;border-radius:9px;padding:5px 10px}
+.hint{font-size:11px;color:var(--muted)}
+.size-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.size-btn,.choice{min-height:54px;border:3px solid #c7a58d;border-radius:12px;background:#fff8ed;box-shadow:0 3px 0 rgba(93,57,42,.12);cursor:pointer;font-weight:900}
+.size-btn.selected,.choice.selected{border-color:#ee8750;background:#fff0dc;box-shadow:0 0 0 2px #ffd29c inset,0 3px 0 rgba(93,57,42,.12)}
+.size-btn small,.choice small{display:block;color:var(--muted);font-weight:700;font-size:11px;margin-top:2px}
+.base-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.base{position:relative;padding:8px 4px 7px;min-height:78px}
+.jar{width:32px;height:42px;margin:0 auto 5px;border:3px solid #725347;border-radius:8px 8px 11px 11px;position:relative;background:linear-gradient(#fff8ed 0 25%,var(--fill) 25%);box-shadow:inset 0 0 0 2px rgba(255,255,255,.45)}
+.jar:before{content:"";position:absolute;left:7px;right:7px;top:-8px;height:8px;border:3px solid #725347;border-radius:6px 6px 2px 2px;background:#eadbca}
+.base span{font-size:11px}.qty{position:absolute;right:4px;top:4px;background:#fff;border:2px solid #caa891;border-radius:99px;padding:1px 5px;font-size:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.topping{min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;border:2px solid #c7a58d;border-radius:11px;background:#fffaf0;cursor:pointer}
+.topping.selected{border:3px solid #ee8750;background:#fff0dc}
+.topping:disabled{opacity:.45;cursor:not-allowed}
+.food{width:37px;height:30px;border-radius:9px;margin-bottom:4px;position:relative;box-shadow:inset 0 0 0 2px rgba(80,50,40,.18)}
+.food.boba{background:radial-gradient(circle at 7px 8px,#9c6043 0 4px,transparent 5px),radial-gradient(circle at 21px 19px,#a96d4f 0 4px,transparent 5px),#c98763}
+.food.jelly{background:repeating-linear-gradient(45deg,#74b77e 0 7px,#a5d58f 7px 13px)}
+.food.fruit{background:linear-gradient(135deg,#e86d55 0 33%,#f7d75d 33% 66%,#ef7187 66%)}
+.food.black{background:#343031}
+.food.cube{background:#b77d5b}
+.food.pudding{background:#f1ca62}
+.food.aloe{background:#f0e7ce}
+.food.ice{background:linear-gradient(135deg,#dff4ff,#b7dff0)}
+.food.cream{background:#fff5df}
+.food.ube{background:#a77ac7}
+.topping span{font-size:10px;font-weight:900;text-align:center}
+.topping em{font-style:normal;font-size:9px;color:var(--muted)}
+.foam-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.foam{min-height:69px}
+.foam .food{height:26px}
+.control-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.slider-card{background:#fff8ed;border:2px solid #c7a58d;border-radius:12px;padding:9px}
+.slider-card label{display:flex;justify-content:space-between;font-weight:900;font-size:12px}
+input[type=range]{width:100%;accent-color:#b86f53}
+.ice-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+.mini{padding:8px 3px;border:2px solid #c7a58d;border-radius:9px;background:#fff;cursor:pointer;font-size:11px;font-weight:900}
+.mini.selected{border-color:#ee8750;background:#fff0dc}
+.mix-panel{margin:10px 12px;padding:10px;background:#f2dfc8;border:3px solid #a97c65;border-radius:14px;box-shadow:var(--shadow)}
+.cup-preview{display:flex;gap:12px;align-items:center}
+.cup{width:68px;height:84px;border:4px solid #765344;border-top-width:7px;border-radius:8px 8px 18px 18px;position:relative;overflow:hidden;background:linear-gradient(#e8c9a2,#b97650)}
+.cup:before{content:"";position:absolute;left:25px;top:-19px;width:9px;height:22px;background:#e9d8c7;border:3px solid #765344;border-radius:8px}
+.cup .pearls{position:absolute;bottom:7px;left:8px;right:8px;height:18px;background:radial-gradient(circle,#9c6043 0 5px,transparent 6px) 0 0/15px 15px}
+.mix-text{flex:1;font-size:12px;line-height:1.5}.mix-text b{font-size:14px}
+.serve{width:100%;min-height:52px;margin-top:10px;border:0;border-radius:12px;background:#7eb58b;color:#fff;font-weight:1000;font-size:16px;cursor:pointer;box-shadow:0 4px 0 #578467}
+.serve:disabled{opacity:.45;cursor:not-allowed}
+.bottom-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:10px 12px;background:#fff5e6;border-top:2px solid #d1b194;position:sticky;bottom:0;z-index:9}
+.tab{min-height:46px;border:2px solid #c7a58d;background:#fff;border-radius:11px;font-weight:900;cursor:pointer}
+.tab.active{background:#ffe2c6;border-color:#ee8750}
+.panel{padding:12px;background:#fff8ec;border-top:2px solid #d1b194}
+.hidden{display:none!important}
+.inventory-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.inv{padding:9px;background:#fff;border:2px solid #c7a58d;border-radius:10px;display:flex;justify-content:space-between;font-size:12px}.inv b{font-size:14px}
+.upgrades{display:grid;gap:8px}.upgrade{background:#fff;border:2px solid #c7a58d;border-radius:11px;padding:10px;display:flex;justify-content:space-between;gap:8px;align-items:center}.upgrade button{border:0;background:#d98e68;color:#fff;border-radius:8px;padding:8px 10px;font-weight:900;cursor:pointer}.upgrade button:disabled{opacity:.4}
+.modal{position:fixed;inset:0;background:rgba(59,37,28,.52);display:grid;place-items:center;padding:18px;z-index:50}.modal-card{width:min(440px,100%);background:#fff7e8;border:3px solid #9f725c;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}.modal-card h2{margin:0 0 7px}.modal-card p{font-size:13px;line-height:1.5}.modal-actions{display:grid;gap:8px;margin-top:12px}.modal-actions button{padding:11px;border:2px solid #b98e76;border-radius:10px;background:#fff;cursor:pointer;font-weight:900}.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#51362b;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;font-weight:900;z-index:60;box-shadow:0 5px 18px rgba(0,0,0,.2);pointer-events:none}
+@media(max-width:430px){.base-grid{grid-template-columns:repeat(3,1fr)}.grid{gap:5px}.topping{min-height:68px}.money{font-size:14px;padding:6px 8px}.section{padding-left:9px;padding-right:9px}}
+
+/* =========================================================
+   MOBILE GAMEPLAY — iPHONE 13 / 390×844
+   Giao diện được bố trí như một màn hình gameplay dọc,
+   không cần zoom và không cuộn toàn trang.
+   ========================================================= */
+html,body{
+  width:100%;
+  height:100%;
+  min-height:100%;
+  overflow:hidden;
+  background:#ead9c3;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  display:flex;
+  justify-content:center;
+  align-items:stretch;
+  overscroll-behavior:none;
+}
+#game{
+  width:min(100vw,390px);
+  max-width:390px;
+  height:100dvh;
+  min-height:620px;
+  margin:0 auto;
+  background:#f6ead6;
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 0 35px rgba(70,42,28,.12);
+}
+
+/* ---------- TOP HUD ---------- */
+.topbar{
+  flex:0 0 69px;
+  height:69px;
+  padding:7px 9px 5px;
+  background:#fff7e9;
+  border-bottom:2px solid #c9a486;
+  position:relative;
+  z-index:10;
+}
+.toprow{
+  height:36px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.pause{
+  width:34px;height:34px;
+  border-width:2px;
+  font-size:15px;
+  flex:0 0 34px;
+}
+.daybox{min-width:0}
+.day{font-size:13px;line-height:14px}
+.clock{font-size:9px;margin-top:1px}
+.money{
+  margin-left:auto;
+  font-size:13px;
+  padding:5px 7px;
+  border-width:1px;
+  border-radius:8px;
+  white-space:nowrap;
+}
+.stats{
+  height:21px;
+  margin-top:4px;
+  gap:4px;
+  overflow:hidden;
+  padding:0;
+}
+.stat{
+  border-width:1px;
+  padding:3px 6px;
+  font-size:9px;
+  line-height:12px;
+  border-radius:99px;
+}
+.stat b{font-size:10px}
+
+/* ---------- SHOP FRONT ---------- */
+.shopfront{
+  flex:0 0 66px;
+  height:66px;
+  background:linear-gradient(#f9d9c9,#eebaa9);
+  border-bottom:2px solid #9c6d5a;
+}
+.awning{
+  height:28px;
+  background:repeating-linear-gradient(
+    90deg,
+    #ef8fa4 0 30px,
+    #fff0e5 30px 60px
+  );
+  border-bottom:2px solid #9c6d5a;
+}
+.sign{
+  top:31px;
+  padding:3px 10px;
+  border-width:2px;
+  border-radius:8px;
+  font-size:11px;
+}
+
+/* ---------- CUSTOMER / ORDER ---------- */
+.order-area{
+  flex:0 0 76px;
+  height:76px;
+  padding:6px 8px 7px;
+  background:#fff3e4;
+  border-bottom:1px solid #d2b195;
+}
+.customer{
+  height:63px;
+  gap:7px;
+}
+.avatar{
+  width:48px;height:48px;
+  border-width:3px;
+  font-size:23px;
+  margin-top:4px;
+}
+.speech{
+  min-width:0;
+  padding:6px 8px;
+  border-width:1.5px;
+  border-radius:12px;
+}
+.speech:before{top:14px}
+.order-title{font-size:11px}
+.order-detail{
+  font-size:9px;
+  line-height:1.25;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.patience{
+  height:8px;
+  margin-top:5px;
+  border-width:1px;
+}
+
+/* ---------- MAIN PLAY AREA ---------- */
+#mainPlay{
+  flex:1 1 auto;
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  background:#f6ead6;
+}
+.section{
+  flex:0 0 auto;
+  padding:4px 8px;
+  border-top:1px solid #d0b092;
+}
+.section-head{
+  margin-bottom:3px;
+  min-height:19px;
+}
+.section-title{
+  font-size:10px;
+  padding:2px 6px;
+  border-width:1px;
+  border-radius:6px;
+}
+.hint{
+  font-size:8px;
+}
+
+/* size row becomes a compact two-button selector */
+.size-row{gap:5px}
+.size-btn{
+  min-height:31px;
+  height:31px;
+  border-width:1.5px;
+  border-radius:7px;
+  font-size:10px;
+  box-shadow:0 2px 0 rgba(93,57,42,.10);
+}
+.size-btn small{
+  display:inline;
+  font-size:8px;
+  margin-left:3px;
+}
+
+/* tea bases: all 6 fit in one compact row */
+.base-grid{
+  grid-template-columns:repeat(6,1fr);
+  gap:4px;
+}
+.base{
+  min-height:58px;
+  height:58px;
+  padding:3px 1px 2px;
+  border-width:1.5px;
+  border-radius:7px;
+}
+.jar{
+  width:20px;height:28px;
+  margin:0 auto 2px;
+  border-width:2px;
+  border-radius:5px 5px 7px 7px;
+}
+.jar:before{
+  left:4px;right:4px;top:-5px;height:5px;
+  border-width:2px;
+}
+.base span{
+  display:block;
+  font-size:7px;
+  line-height:8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.qty{
+  right:2px;top:2px;
+  border-width:1px;
+  padding:0 3px;
+  font-size:7px;
+}
+
+/* toppings: one dense 4-column row/area */
+.grid{
+  grid-template-columns:repeat(4,1fr);
+  gap:4px;
+}
+.topping{
+  min-height:49px;
+  height:49px;
+  padding:2px;
+  border-width:1.5px;
+  border-radius:7px;
+}
+.topping.selected{border-width:2px}
+.food{
+  width:25px;height:19px;
+  margin-bottom:2px;
+  border-radius:5px;
+  box-shadow:inset 0 0 0 1px rgba(80,50,40,.16);
+}
+.topping span{
+  font-size:7px;
+  line-height:8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+.topping em{font-size:6.5px;line-height:7px}
+
+/* foam: all five options fit horizontally */
+.foam-grid{
+  grid-template-columns:repeat(5,1fr);
+  gap:4px;
+}
+.foam{
+  min-height:43px;
+  height:43px;
+}
+.foam .food{
+  height:17px;
+  margin-bottom:1px;
+}
+
+/* sugar / ice compact */
+.control-row{gap:5px}
+.slider-card{
+  padding:5px 6px;
+  border-width:1.5px;
+  border-radius:7px;
+  min-height:47px;
+}
+.slider-card label{
+  font-size:8px;
+}
+input[type=range]{height:13px;margin:2px 0 0}
+.ice-buttons{gap:3px;margin-top:2px}
+.mini{
+  padding:4px 1px;
+  min-height:22px;
+  border-width:1px;
+  border-radius:5px;
+  font-size:7px;
+}
+
+/* brew/serve area */
+.mix-panel{
+  flex:0 0 auto;
+  margin:4px 8px 5px;
+  padding:5px 7px;
+  border-width:1.5px;
+  border-radius:9px;
+  box-shadow:0 2px 0 rgba(93,57,42,.12);
+}
+.cup-preview{gap:7px}
+.cup{
+  width:35px;height:43px;
+  border-width:2px;
+  border-top-width:4px;
+  border-radius:4px 4px 9px 9px;
+  flex:0 0 35px;
+}
+.cup:before{
+  left:13px;top:-11px;width:5px;height:12px;
+  border-width:1.5px;
+}
+.cup .pearls{
+  bottom:4px;left:4px;right:4px;height:10px;
+  background:radial-gradient(circle,#9c6043 0 3px,transparent 3.5px) 0 0/8px 8px;
+}
+.mix-text{
+  font-size:8px;
+  line-height:1.25;
+  min-width:0;
+}
+.mix-text b{font-size:9px}
+#mixSummary{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.serve{
+  min-height:28px;
+  height:28px;
+  margin-top:4px;
+  border-radius:7px;
+  font-size:10px;
+  box-shadow:0 2px 0 #578467;
+}
+
+/* ---------- BOTTOM NAV ---------- */
+.bottom-tabs{
+  flex:0 0 48px;
+  height:48px;
+  gap:4px;
+  padding:4px 7px calc(4px + env(safe-area-inset-bottom));
+  background:#fff4e5;
+  border-top:2px solid #c9a486;
+  position:relative;
+  z-index:12;
+}
+.tab{
+  min-height:39px;
+  height:39px;
+  border-width:1.5px;
+  border-radius:8px;
+  font-size:9px;
+}
+
+/* inventory/shop panels share the same phone viewport */
+.panel{
+  flex:1 1 auto;
+  min-height:0;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:8px;
+}
+.inventory-grid{grid-template-columns:repeat(2,1fr);gap:5px}
+.inv{
+  padding:7px;
+  border-width:1.5px;
+  border-radius:7px;
+  font-size:9px;
+}
+.inv b{font-size:11px}
+.upgrades{gap:5px}
+.upgrade{
+  padding:7px;
+  border-width:1.5px;
+  border-radius:7px;
+}
+.upgrade button{
+  padding:6px 7px;
+  font-size:9px;
+}
+
+/* ---------- MODAL / TOAST ---------- */
+.modal{padding:12px}
+.modal-card{
+  width:100%;
+  max-width:360px;
+  border-width:2px;
+  border-radius:13px;
+  padding:12px;
+}
+.modal-card h2{font-size:17px}
+.modal-card p{font-size:11px}
+.modal-actions{gap:6px;margin-top:8px}
+.modal-actions button{padding:9px;border-width:1.5px;border-radius:8px;font-size:11px}
+.toast{
+  bottom:58px;
+  max-width:calc(100% - 24px);
+  padding:8px 11px;
+  font-size:9px;
+}
+
+/* Do not let mobile browser text auto-resize */
+button,input{touch-action:manipulation}
+
+/* Extra-short phones: keep the gameplay inside the viewport */
+@media (max-height:760px){
+  .topbar{flex-basis:62px;height:62px;padding-top:5px}
+  .shopfront{flex-basis:58px;height:58px}
+  .order-area{flex-basis:68px;height:68px}
+  .customer{height:55px}
+  .avatar{width:42px;height:42px;font-size:20px}
+  .base{height:52px;min-height:52px}
+  .topping{height:44px;min-height:44px}
+  .foam{height:39px;min-height:39px}
+  .bottom-tabs{flex-basis:44px;height:44px}
+  .tab{height:35px;min-height:35px}
+}
+
+</style>
+</head>
+<body>
+<div id="game">
+  <header class="topbar">
+    <div class="toprow">
+      <button class="pause" id="pauseBtn" type="button" aria-label="Tạm dừng">Ⅱ</button>
+      <div class="daybox"><div class="day" id="dayLabel">Ngày 1</div><div class="clock" id="clockLabel">⏱ 09:00</div></div>
+      <div class="money">🪙 <span id="money">500</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat">⭐ <b id="rating">5.0</b></div>
+      <div class="stat">👥 <b id="served">0</b> khách</div>
+      <div class="stat">🔥 Combo <b id="combo">0</b></div>
+      <div class="stat">❤️ <b id="rep">100</b>%</div>
+    </div>
+  </header>
+
+  <div class="shopfront">
+    <div class="awning"></div>
+    <div class="sign">TIỆM TRÀ SỮA</div>
+  </div>
+
+  <section class="order-area">
+    <div class="customer">
+      <div class="avatar" id="avatar">👩🏻</div>
+      <div class="speech">
+        <div class="order-title" id="customerName">Bà Lan</div>
+        <div class="order-detail" id="orderText">Đang chuẩn bị order...</div>
+        <div class="patience"><i id="patienceBar"></i></div>
+      </div>
+    </div>
+  </section>
+
+  <main id="mainPlay">
+    <section class="section">
+      <div class="section-head"><div class="section-title">🥤 LẤY LY</div><div class="hint">Chọn size theo order</div></div>
+      <div class="size-row">
+        <button class="size-btn" data-size="M" type="button">LY M<small id="cupM">18 ly</small></button>
+        <button class="size-btn" data-size="L" type="button">LY L<small id="cupL">14 ly</small></button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div class="section-title">🫖 NỀN TRÀ</div><div class="hint">Chọn đúng loại</div></div>
+      <div class="base-grid" id="baseGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div class="section-title">🍡 TOPPING</div><div class="hint">Có thể chọn nhiều</div></div>
+      <div class="grid" id="toppingGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div class="section-title">☁️ FOAM</div><div class="hint">Tối đa 1 loại</div></div>
+      <div class="foam-grid" id="foamGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="control-row">
+        <div class="slider-card">
+          <label>🍬 Đường <span id="sugarVal">70%</span></label>
+          <input id="sugar" type="range" min="0" max="100" step="10" value="70">
+        </div>
+        <div class="slider-card">
+          <label>🧊 Đá</label>
+          <div class="ice-buttons">
+            <button class="mini" data-ice="none" type="button">Không</button>
+            <button class="mini selected" data-ice="normal" type="button">Bình thường</button>
+            <button class="mini" data-ice="more" type="button">Nhiều</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mix-panel">
+      <div class="cup-preview">
+        <div class="cup" id="cupPreview"><div class="pearls"></div></div>
+        <div class="mix-text"><b>Ly đang pha</b><br><span id="mixSummary">Chưa chọn đủ nguyên liệu.</span></div>
+      </div>
+      <button class="serve" id="serveBtn" type="button">GIAO LY CHO KHÁCH</button>
+    </section>
+  </main>
+
+  <section class="panel hidden" id="inventoryPanel">
+    <div class="section-head"><div class="section-title">📦 KHO NGUYÊN LIỆU</div><div class="hint">Tự động trừ khi bán</div></div>
+    <div class="inventory-grid" id="inventoryGrid"></div>
+  </section>
+
+  <section class="panel hidden" id="shopPanel">
+    <div class="section-head"><div class="section-title">🏪 NÂNG CẤP QUÁN</div><div class="hint">Mua bằng tiền</div></div>
+    <div class="upgrades" id="upgrades"></div>
+  </section>
+
+  <nav class="bottom-tabs">
+    <button class="tab active" data-tab="play" type="button">🥤 Pha chế</button>
+    <button class="tab" data-tab="inventory" type="button">📦 Kho</button>
+    <button class="tab" data-tab="shop" type="button">⭐ Nâng cấp</button>
+  </nav>
+</div>
+
+<div class="modal hidden" id="modal">
+  <div class="modal-card">
+    <h2 id="modalTitle">Thông báo</h2>
+    <p id="modalText"></p>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+(() => {
+"use strict";
+
+const KEY = "traSuaOffline_v1";
+const BASES = [
+  {id:"milk",name:"Trà sữa",fill:"#d8a77b",emoji:"🧋",price:8},
+  {id:"matcha",name:"Matcha",fill:"#9ac27c",emoji:"🍵",price:10},
+  {id:"black",name:"Hồng trà",fill:"#b86662",emoji:"🫖",price:8},
+  {id:"green",name:"Lục trà",fill:"#9ab978",emoji:"🍃",price:8},
+  {id:"oolong",name:"Olong",fill:"#c59b57",emoji:"🫖",price:9},
+  {id:"thai",name:"Trà Thái",fill:"#e79555",emoji:"🧡",price:10}
+];
+const TOPPINGS = [
+  {id:"boba",name:"Trân châu",kind:"boba",price:3},
+  {id:"jelly",name:"Thạch xanh",kind:"jelly",price:3},
+  {id:"fruit",name:"Thạch trái cây",kind:"fruit",price:4},
+  {id:"blackj",name:"Thạch đen",kind:"black",price:3},
+  {id:"cube",name:"Thạch nâu",kind:"cube",price:3},
+  {id:"pudding",name:"Pudding",kind:"pudding",price:4},
+  {id:"aloe",name:"Nha đam",kind:"aloe",price:4},
+  {id:"cheese",name:"Thạch sữa",kind:"cream",price:4}
+];
+const FOAMS = [
+  {id:"cheese",name:"Foam cheese",kind:"cream",price:5},
+  {id:"matcha",name:"Foam matcha",kind:"jelly",price:5},
+  {id:"salt",name:"Foam muối",kind:"cream",price:4},
+  {id:"ube",name:"Foam Ube",kind:"ube",price:6},
+  {id:"none",name:"Không foam",kind:"aloe",price:0}
+];
+const NAMES = ["Bà Lan","Chị Như","Ngọc Diệp","Anh Minh","Cô Mai","Bé An","Chú Nam","Hà My","Tuấn","Linh"];
+const FACES = ["👩🏻","👩🏼","👨🏻","👩🏽","👨🏼","👧🏻","👨🏽","👩🏻‍🦰","🧑🏻","👩🏼‍🦱"];
+
+const defaultState = {
+  day:1, money:500, rating:5, rep:100, served:0, combo:0, revenueToday:0,
+  clock:9*60, paused:false, customersToday:0,
+  cups:{M:18,L:14},
+  ingredients:{milk:30,matcha:25,black:30,green:30,oolong:28,thai:24,boba:24,jelly:18,fruit:14,blackj:18,cube:15,pudding:12,aloe:12,cheese:10,ice:40,sugar:40,foamCheese:12,foamMatcha:10,foamSalt:10,foamUbe:8},
+  upgrades:{patience:0,price:0,stock:0},
+  current:null,
+  selected:{size:null,base:null,toppings:[],foam:"none",sugar:70,ice:"normal"}
+};
+
+let state = load();
+let patienceTick = null;
+let dayTick = null;
+
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){
+      const s=JSON.parse(raw);
+      return Object.assign(clone(defaultState),s,{cups:Object.assign(clone(defaultState.cups),s.cups||{}),ingredients:Object.assign(clone(defaultState.ingredients),s.ingredients||{}),upgrades:Object.assign(clone(defaultState.upgrades),s.upgrades||{}),selected:Object.assign(clone(defaultState.selected),s.selected||{})});
+    }
+  }catch(e){}
+  return clone(defaultState);
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function money(n){return Math.max(0,Math.round(n)).toLocaleString("vi-VN");}
+function el(id){return document.getElementById(id);}
+function toast(msg){
+  const t=el("toast");t.textContent=msg;t.classList.remove("hidden");
+  clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.add("hidden"),1800);
+}
+function openModal(title,text,actions){
+  el("modalTitle").textContent=title;el("modalText").textContent=text;
+  const box=el("modalActions");box.innerHTML="";
+  actions.forEach(a=>{const b=document.createElement("button");b.type="button";b.textContent=a.label;b.addEventListener("click",()=>{closeModal();a.fn();});box.appendChild(b);});
+  el("modal").classList.remove("hidden");
+}
+function closeModal(){el("modal").classList.add("hidden");}
+function randomInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function choose(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+function makeOrder(){
+  const base=choose(BASES);
+  const tops=[];
+  const topCount=Math.random()<0.62?randomInt(0,2):randomInt(1,3);
+  const shuffled=[...TOPPINGS].sort(()=>Math.random()-.5);
+  for(let i=0;i<topCount;i++)tops.push(shuffled[i].id);
+  const foam=Math.random()<0.34?choose(FOAMS.filter(x=>x.id!=="none")).id:"none";
+  const sugar=choose([30,50,70,100]);
+  const ice=choose(["none","normal","more"]);
+  return {size:Math.random()<.55?"M":"L",base:base.id,toppings:tops,foam,sugar,ice,served:false};
+}
+function newCustomer(){
+  state.current={name:choose(NAMES),face:choose(FACES),patience:100,order:makeOrder()};
+  state.selected={size:null,base:null,toppings:[],foam:"none",sugar:70,ice:"normal"};
+  state.customersToday++;
+  render();
+  save();
+}
+function formatOrder(o){
+  const base=BASES.find(x=>x.id===o.base)?.name||"Trà";
+  const top=o.toppings.map(id=>TOPPINGS.find(x=>x.id===id)?.name).filter(Boolean);
+  const foam=FOAMS.find(x=>x.id===o.foam)?.name;
+  const sugar=o.sugar+"% đường";
+  const ice=o.ice==="none"?"không đá":o.ice==="more"?"nhiều đá":"đá bình thường";
+  return `Ly ${o.size} · ${base} · ${sugar} · ${ice}${top.length?` · ${top.join(", ")}`:""}${o.foam!=="none"?` · ${foam}`:""}`;
+}
+function render(){
+  el("dayLabel").textContent="Ngày "+state.day;
+  const mins=Math.floor(state.clock);
+  const hh=String(Math.floor(mins/60)%24).padStart(2,"0"), mm=String(mins%60).padStart(2,"0");
+  el("clockLabel").textContent="⏱ "+hh+":"+mm;
+  el("money").textContent=money(state.money);
+  el("rating").textContent=state.rating.toFixed(1);
+  el("served").textContent=state.served;
+  el("combo").textContent=state.combo;
+  el("rep").textContent=Math.round(state.rep);
+  el("cupM").textContent=state.cups.M+" ly";
+  el("cupL").textContent=state.cups.L+" ly";
+
+  if(state.current){
+    el("customerName").textContent=state.current.name;
+    el("avatar").textContent=state.current.face;
+    el("orderText").textContent=formatOrder(state.current.order);
+    el("patienceBar").style.width=Math.max(0,state.current.patience)+"%";
+  }else{
+    el("customerName").textContent="Quầy đang mở";
+    el("orderText").textContent="Chờ khách mới...";
+    el("patienceBar").style.width="100%";
+  }
+
+  document.querySelectorAll(".size-btn").forEach(b=>b.classList.toggle("selected",state.selected.size===b.dataset.size));
+  document.querySelectorAll("[data-ice]").forEach(b=>b.classList.toggle("selected",state.selected.ice===b.dataset.ice));
+  el("sugar").value=state.selected.sugar;
+  el("sugarVal").textContent=state.selected.sugar+"%";
+
+  renderBases();renderToppings();renderFoams();renderMix();renderInventory();renderUpgrades();
+}
+function renderBases(){
+  const box=el("baseGrid");box.innerHTML="";
+  BASES.forEach(x=>{
+    const b=document.createElement("button");b.type="button";b.className="choice base"+(state.selected.base===x.id?" selected":"");
+    b.innerHTML=`<div class="jar" style="--fill:${x.fill}"></div><span>${x.name}</span><span class="qty">${state.ingredients[x.id]||0}</span>`;
+    b.addEventListener("click",()=>{if((state.ingredients[x.id]||0)>0){state.selected.base=x.id;render();}});
+    box.appendChild(b);
+  });
+}
+function renderToppings(){
+  const box=el("toppingGrid");box.innerHTML="";
+  TOPPINGS.forEach(x=>{
+    const qty=state.ingredients[x.id]||0;
+    const b=document.createElement("button");b.type="button";b.className="topping"+(state.selected.toppings.includes(x.id)?" selected":"");b.disabled=qty<=0;
+    b.innerHTML=`<div class="food ${x.kind}"></div><span>${x.name}</span><em>${qty}</em>`;
+    b.addEventListener("click",()=>{
+      const i=state.selected.toppings.indexOf(x.id);
+      if(i>=0)state.selected.toppings.splice(i,1);else if(state.selected.toppings.length<3)state.selected.toppings.push(x.id);
+      render();
+    });
+    box.appendChild(b);
+  });
+}
+function renderFoams(){
+  const box=el("foamGrid");box.innerHTML="";
+  FOAMS.forEach(x=>{
+    const key=x.id==="cheese"?"foamCheese":x.id==="matcha"?"foamMatcha":x.id==="salt"?"foamSalt":x.id==="ube"?"foamUbe":null;
+    const qty=key?state.ingredients[key]:999;
+    const b=document.createElement("button");b.type="button";b.className="topping foam"+(state.selected.foam===x.id?" selected":"");b.disabled=qty<=0;
+    b.innerHTML=`<div class="food ${x.kind}"></div><span>${x.name}</span><em>${key?qty:"∞"}</em>`;
+    b.addEventListener("click",()=>{state.selected.foam=x.id;render();});
+    box.appendChild(b);
+  });
+}
+function renderMix(){
+  const s=state.selected;
+  const base=BASES.find(x=>x.id===s.base)?.name||"chưa chọn nền";
+  const foam=FOAMS.find(x=>x.id===s.foam)?.name||"";
+  const tops=s.toppings.map(id=>TOPPINGS.find(x=>x.id===id)?.name).filter(Boolean);
+  const ready=!!s.size&&!!s.base;
+  el("mixSummary").innerHTML=ready?`Ly <b>${s.size}</b> · ${base} · ${s.sugar}% đường · ${s.ice==="none"?"không đá":s.ice==="more"?"nhiều đá":"đá bình thường"}${tops.length?" · "+tops.join(", "):""}${s.foam!=="none"?" · "+foam:""}`:"Chọn size và nền trà để bắt đầu.";
+  el("serveBtn").disabled=!ready||!state.current||state.paused;
+}
+function renderInventory(){
+  const labels={milk:"Trà sữa",matcha:"Matcha",black:"Hồng trà",green:"Lục trà",oolong:"Olong",thai:"Trà Thái",boba:"Trân châu",jelly:"Thạch xanh",fruit:"Thạch trái cây",blackj:"Thạch đen",cube:"Thạch nâu",pudding:"Pudding",aloe:"Nha đam",cheese:"Thạch sữa",ice:"Đá viên",sugar:"Nước đường",foamCheese:"Foam cheese",foamMatcha:"Foam matcha",foamSalt:"Foam muối",foamUbe:"Foam Ube"};
+  const box=el("inventoryGrid");box.innerHTML="";
+  Object.keys(labels).forEach(k=>{const d=document.createElement("div");d.className="inv";d.innerHTML=`<span>${labels[k]}</span><b>${state.ingredients[k]||0}</b>`;box.appendChild(d);});
+}
+function renderUpgrades(){
+  const data=[
+    {id:"patience",name:"Bàn ghế êm hơn",desc:"+15% kiên nhẫn khách",cost:180,limit:3},
+    {id:"price",name:"Ly đẹp & menu mới",desc:"+1 giá trị mỗi ly / cấp",cost:240,limit:3},
+    {id:"stock",name:"Kho lạnh",desc:"+10 tồn kho cơ bản / cấp",cost:300,limit:3}
+  ];
+  const box=el("upgrades");box.innerHTML="";
+  data.forEach(u=>{
+    const lv=state.upgrades[u.id]||0,d=document.createElement("div");d.className="upgrade";
+    const disabled=lv>=u.limit||state.money<u.cost;
+    d.innerHTML=`<div><b>${u.name}</b><div class="hint">${u.desc} · Cấp ${lv}/${u.limit}</div></div><button type="button" ${disabled?"disabled":""}>${lv>=u.limit?"ĐÃ MAX":"🪙 "+u.cost}</button>`;
+    d.querySelector("button").addEventListener("click",()=>buyUpgrade(u));
+    box.appendChild(d);
+  });
+}
+function buyUpgrade(u){
+  if(state.upgrades[u.id]>=u.limit||state.money<u.cost)return;
+  state.money-=u.cost;state.upgrades[u.id]++;
+  if(u.id==="stock"){
+    Object.keys(state.ingredients).forEach(k=>{if(!["ice","sugar"].includes(k))state.ingredients[k]+=10;});
+  }
+  toast("Đã nâng cấp: "+u.name);save();render();
+}
+function selectedMatches(){
+  if(!state.current)return false;
+  const a=state.current.order,b=state.selected;
+  return a.size===b.size&&a.base===b.base&&a.sugar===b.sugar&&a.ice===b.ice&&a.foam===b.foam&&a.toppings.length===b.toppings.length&&a.toppings.every(x=>b.toppings.includes(x));
+}
+function consume(){
+  const s=state.selected;
+  if(state.cups[s.size]<=0){toast("Hết ly size "+s.size);return false;}
+  if((state.ingredients[s.base]||0)<=0){toast("Hết nguyên liệu nền");return false;}
+  for(const id of s.toppings)if((state.ingredients[id]||0)<=0){toast("Một topping đã hết");return false;}
+  if(s.foam!=="none"){
+    const key=s.foam==="cheese"?"foamCheese":s.foam==="matcha"?"foamMatcha":s.foam==="salt"?"foamSalt":"foamUbe";
+    if((state.ingredients[key]||0)<=0){toast("Hết "+(FOAMS.find(x=>x.id===s.foam)?.name||"foam"));return false;}
+    state.ingredients[key]--;
+  }
+  state.cups[s.size]--;
+  state.ingredients[s.base]--;
+  s.toppings.forEach(id=>state.ingredients[id]--);
+  state.ingredients.ice=Math.max(0,state.ingredients.ice-(s.ice==="none"?0:1));
+  state.ingredients.sugar=Math.max(0,state.ingredients.sugar-1);
+  return true;
+}
+function serve(){
+  if(!state.current||!state.selected.size||!state.selected.base)return;
+  if(!consume())return;
+  const correct=selectedMatches();
+  let basePrice=18+(state.selected.size==="L"?5:0);
+  basePrice+=state.selected.toppings.reduce((n,id)=>n+(TOPPINGS.find(x=>x.id===id)?.price||0),0);
+  basePrice+=(FOAMS.find(x=>x.id===state.selected.foam)?.price||0);
+  basePrice+=state.upgrades.price||0;
+  if(correct){
+    const patienceBonus=Math.max(0,state.current.patience)/100;
+    const earn=Math.round(basePrice*(1+patienceBonus*.25));
+    state.money+=earn;state.revenueToday+=earn;state.served++;state.combo++;
+    state.rating=Math.min(5,Math.round((state.rating+0.02)*10)/10);state.rep=Math.min(100,state.rep+0.4);
+    toast("Đúng order! +🪙 "+earn);
+  }else{
+    const earn=Math.max(3,Math.round(basePrice*.35));
+    state.money+=earn;state.revenueToday+=earn;state.served++;state.combo=0;
+    state.rating=Math.max(1,Math.round((state.rating-0.15)*10)/10);state.rep=Math.max(0,state.rep-2);
+    toast("Sai công thức — khách không hài lòng");
+  }
+  state.current=null;save();render();
+  setTimeout(()=>{if(!state.paused&&state.clock<20*60)newCustomer();},650);
+}
+function maybeEvent(){
+  if(Math.random()>0.045)return;
+  const events=[
+    {title:"Khách quen ghé quán",text:"Một khách quen vừa ghé. Họ đang rất vui vì lần trước bạn pha đúng order.",acts:[
+      {label:"Tặng topping miễn phí",fn:()=>{state.rep=Math.min(100,state.rep+3);toast("+3% danh tiếng");}},
+      {label:"Giữ nguyên",fn:()=>toast("Khách vui vẻ rời đi.")}
+    ]},
+    {title:"Bà Lan ôm ly chạy mất!",text:"Một khách tinh nghịch ôm ly chạy mất, không trả tiền.",acts:[
+      {label:"Đành chịu",fn:()=>{state.rep=Math.max(0,state.rep-1);toast("Mất một đơn");}},
+      {label:"Đuổi theo",fn:()=>{state.money+=8;toast("May quá, lấy lại được 8 xu");}}
+    ]},
+    {title:"Đơn đông bất ngờ",text:"Một nhóm khách vừa tới. Nếu phục vụ nhanh, quán sẽ được cộng danh tiếng.",acts:[
+      {label:"Nhận thử thách",fn:()=>{state.combo+=2;state.rep=Math.min(100,state.rep+2);toast("Combo +2, danh tiếng +2%");}},
+      {label:"Bỏ qua",fn:()=>toast("Bạn giữ nhịp phục vụ bình thường.")}
+    ]}
+  ];
+  const e=choose(events);
+  openModal(e.title,e.text,e.acts);
+}
+function tick(){
+  if(state.paused)return;
+  state.clock+=0.12;
+  if(state.clock>=20*60){endDay();return;}
+  if(state.current){
+    state.current.patience-=0.10+(state.upgrades.patience||0)*-0.015;
+    if(state.current.patience<=0){
+      state.combo=0;state.rep=Math.max(0,state.rep-1.5);state.rating=Math.max(1,Math.round((state.rating-.08)*10)/10);
+      toast(state.current.name+" bỏ đi vì chờ quá lâu!");
+      state.current=null;setTimeout(()=>{if(!state.paused)newCustomer();},500);
+    }
+  }else if(Math.random()<0.018)newCustomer();
+  if(Math.random()<0.0025)maybeEvent();
+  render();
+}
+function startDay(){
+  state.clock=9*60;state.revenueToday=0;state.customersToday=0;state.current=null;
+  state.cups.M+=4+state.upgrades.stock*2;state.cups.L+=4+state.upgrades.stock*2;
+  Object.keys(state.ingredients).forEach(k=>{
+    if(!["ice","sugar"].includes(k))state.ingredients[k]+=Math.min(8,2+state.upgrades.stock);
+  });
+  newCustomer();save();render();
+}
+function endDay(){
+  if(state.paused)return;
+  state.paused=true;clearInterval(dayTick);
+  const revenue=state.revenueToday;
+  const wage=25+state.day*4;
+  const supplies=Math.round(revenue*.12);
+  const profit=revenue-wage-supplies;
+  state.money=Math.max(0,state.money+profit);
+  openModal("Hết ngày "+state.day,
+    `Doanh thu: ${money(revenue)} xu. Chi phí vận hành: ${money(wage+supplies)} xu. Kết quả hôm nay: ${profit>=0?"+":""}${money(profit)} xu. Bạn đã phục vụ ${state.customersToday} khách.`,
+    [{label:"Bắt đầu ngày tiếp theo",fn:()=>{state.day++;state.paused=false;startDay();dayTick=setInterval(tick,100);}}]
+  );
+  save();render();
+}
+function togglePause(){
+  state.paused=!state.paused;
+  el("pauseBtn").textContent=state.paused?"▶":"Ⅱ";
+  if(!state.paused&&!state.current)newCustomer();
+  render();
+}
+document.querySelectorAll(".size-btn").forEach(b=>b.addEventListener("click",()=>{state.selected.size=b.dataset.size;render();}));
+document.querySelectorAll("[data-ice]").forEach(b=>b.addEventListener("click",()=>{state.selected.ice=b.dataset.ice;render();}));
+el("sugar").addEventListener("input",e=>{state.selected.sugar=Math.round(Number(e.target.value)/10)*10;render();});
+el("serveBtn").addEventListener("click",serve);
+el("pauseBtn").addEventListener("click",togglePause);
+
+document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
+  const tab=btn.dataset.tab;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===btn));
+  el("mainPlay").classList.toggle("hidden",tab!=="play");
+  el("inventoryPanel").classList.toggle("hidden",tab!=="inventory");
+  el("shopPanel").classList.toggle("hidden",tab!=="shop");
+}));
+
+window.addEventListener("beforeunload",save);
+
+if(!state.current) newCustomer();
+render();
+dayTick=setInterval(tick,100);
+})();
+</script>
+</body>
+</html>
